@@ -1,0 +1,556 @@
+package Yashasvi.Allen;
+import java.awt.Color;
+import java.awt.GridLayout;
+import javax.swing.* ;
+
+
+public class Main extends JFrame {
+    public boolean cr;
+
+    public String color;
+    public int ct = 1;
+    public int i;
+    public int j = 1;
+    public static String[] buttonText = new String[64];
+    public static JButton[] buttons = new JButton[64];
+    public int copyic = -1;
+    public Main() {
+
+        color = " ";
+
+        cr = false;
+
+        JFrame f = new JFrame(" Enjoy Chess ");
+
+        for (i = 0; i < 63; i += 8) {
+            for (j = i; j <= i + 7; ++j) {
+                cr = !cr;
+                buttons[j] = new JButton(buttonText[j]);
+                if (cr) {
+                    buttons[j].setBackground(Color.white);
+                } else {
+                    buttons[j].setBackground(Color.black);
+                }
+
+                int dj = j;
+                if (color.equals("white")) {
+                    buttons[j].setEnabled(!black(buttonText[j]));
+                } else if (color.equals("black")) {
+                    buttons[j].setEnabled(!white(buttonText[j]));
+                }
+                //->
+                buttons[dj].addActionListener((click) ->{
+                    clickbody: {
+                        disable(ct);
+                        Color colorbg = buttons[dj].getBackground();
+                        if (colorbg.equals(Color.green) || colorbg.equals(Color.red)) {
+                            if (colorbg.equals(Color.red) && king(buttonText[dj])) {
+                                String colorstr,
+                                        oppo;
+                                if (black(buttonText[dj])) {
+                                    colorstr = " Black ";
+                                    oppo = " White ";
+                                }
+                                else {
+                                    colorstr = " white ";
+                                    oppo = " Black ";
+                                }
+
+                                JOptionPane.showMessageDialog(this, colorstr + " checkmated " + oppo);
+                                System.exit(0);
+                            }
+
+                            buttonText[dj] = buttonText[copyic];
+                            buttonText[copyic] = " ";
+                            resetcolor();
+                            for (int lp = 0; lp < 64; lp++)
+                                buttons[lp].setText(buttonText[lp]);
+                            ct++;
+                            disable(ct);
+                            break clickbody;
+                        }
+
+                        if (black(buttonText[dj])) color = "black";
+                        else if (white(buttonText[dj])) color = "white";
+
+                        if (pawn(buttonText[dj])) {
+                            resetcolor();
+                            if (color.equals("white")) {
+                                int moves = dj + 8;
+                                if (limit(moves)) if (empty(buttonText[moves])) {
+                                    buttons[moves].setBackground(Color.green);
+                                    copyic = dj;
+
+                                }
+                                if (limit(dj - 7)) if (black(buttonText[dj - 7])) {
+                                    buttons[dj - 7].setBackground(Color.red);
+                                    copyic = dj;
+                                }
+                                if (limit(dj - 9)) if (black(buttonText[dj - 9])) {
+                                    buttons[dj - 9].setBackground(Color.red);
+                                    copyic = dj;
+
+                                }
+                            } else if (color.equals("black")) {
+                                int moves = dj - 8;
+                                if (limit(moves)) if (empty(buttonText[moves])) {
+                                    buttons[moves].setBackground(Color.green);
+                                    copyic = dj;
+
+                                }
+                                if (limit(dj - 7)) if (white(buttonText[dj - 7])) {
+                                    buttons[dj - 7].setBackground(Color.red);
+                                    copyic = dj;
+                                }
+                                if (limit(dj - 9)) if (white(buttonText[dj - 9])) {
+                                    buttons[dj - 9].setBackground(Color.red);
+                                    copyic = dj;
+
+                                }
+                            }
+                        }
+
+                        if (rook(buttonText[dj]) || queen(buttonText[dj])) {
+                            resetcolor();
+                            if (color.equals("black")) {
+                                int vertlimit = dj % 8; //up
+
+                                int copy;
+                                for (copy = dj - 8; copy >= vertlimit && empty(buttonText[copy]); copy -= 8) {
+
+                                    buttons[copy].setBackground(Color.green);
+                                    copyic = dj;
+
+                                }
+                                if (white(buttonText[copy])) {
+                                    buttons[copy].setBackground(Color.red);
+                                    copyic = dj;
+
+                                }
+                            } else if (color.equals("white")) {
+                                int vertlimit = 56 + (dj % 8); //down
+
+                                int copy;
+                                for (copy = dj + 8; copy <= vertlimit && empty(buttonText[copy]); copy += 8) {
+
+                                    buttons[copy].setBackground(Color.green);
+                                    copyic = dj;
+
+                                }
+                                if (black(buttonText[copy])) {
+                                    buttons[copy].setBackground(Color.red);
+                                    copyic = dj;
+
+                                }
+                            }
+                        }
+                        if (horse(buttonText[dj]) || queen(buttonText[dj])) {
+                            resetcolor();
+                            if (color.equals("black")) {
+                                int[] moves = {
+                                        dj - 17,
+                                        dj - 15,
+                                        dj - 6,
+                                        dj + 10,
+                                        dj + 17,
+                                        dj + 15,
+                                        dj + 6,
+                                        dj - 10
+                                };
+                                for (int copy: moves) {
+                                    if (limit(copy)) if (empty(buttonText[copy])) {
+                                        buttons[copy].setBackground(Color.green);
+                                        copyic = dj;
+                                    }
+                                    if (limit(copy)) if (white(buttonText[copy])) {
+                                        buttons[copy].setBackground(Color.red);
+                                        copyic = dj;
+                                    }
+
+                                }
+                            }
+                            else if (color.equals("white")) {
+                                int[] moves = {
+                                        dj - 17,
+                                        dj - 15,
+                                        dj - 6,
+                                        dj + 10,
+                                        dj + 17,
+                                        dj + 15,
+                                        dj + 6,
+                                        dj - 10
+                                };
+                                for (int copy: moves) {
+                                    if (limit(copy)) if (empty(buttonText[copy])) {
+                                        buttons[copy].setBackground(Color.green);
+                                        copyic = dj;
+                                    }
+                                    if (limit(copy)) if (black(buttonText[copy])) {
+                                        buttons[copy].setBackground(Color.red);
+                                        copyic = dj;
+                                    }
+
+                                }
+                            }
+                        }
+                        if (bishop(buttonText[dj]) || queen(buttonText[dj])) {
+                            resetcolor();
+                            if (color.equals("white")) {
+
+                                int copy;
+                                System.out.println();
+                                copy = dj - 9;
+                                if (Math.abs(row(copy) - row(copy - 9)) == 1) for (copy = dj - 9; limit(copy); copy -= 9) {
+                                    if (!empty(buttonText[copy])) break;
+                                    System.out.println(copy + " = " + buttonText[copy]);
+                                    System.out.println(copy + " , " + (copy - 9));
+                                    System.out.println(row(copy) + " , " + row(copy - 9) + " , " + (Math.abs(row(copy) - row(copy - 9)) != 1));
+                                    buttons[copy].setBackground(Color.green);
+                                    copyic = dj;
+                                    if (Math.abs(row(copy) - row(copy - 9)) != 1) {
+                                        break;
+                                    }
+
+                                }
+                                if (limit(copy)) if (black(buttonText[copy])) {
+                                    buttons[copy].setBackground(Color.red);
+                                    copyic = dj;
+                                }
+
+                                System.out.println();
+                                copy = dj - 7;
+                                if (Math.abs(row(copy) - row(copy - 7)) == 1) for (copy = dj - 7; limit(copy); copy -= 7) {
+                                    if (!empty(buttonText[copy])) break;
+                                    System.out.println(copy + " = " + buttonText[copy]);
+                                    System.out.println(copy + " , " + (copy - 7));
+                                    System.out.println(row(copy) + " , " + row(copy - 7) + " , " + (Math.abs(row(copy) - row(copy - 7)) != 1));
+                                    buttons[copy].setBackground(Color.green);
+                                    copyic = dj;
+                                    if (Math.abs(row(copy) - row(copy - 7)) != 1) {
+                                        break;
+                                    }
+
+                                }
+                                if (limit(copy)) if (black(buttonText[copy])) {
+                                    buttons[copy].setBackground(Color.red);
+                                    copyic = dj;
+                                }
+
+                                System.out.println();
+                                copy = dj + 7;
+                                if (Math.abs(row(copy) - row(copy + 7)) == 1) for (copy = dj + 7; limit(copy); copy += 7) {
+                                    if (!empty(buttonText[copy])) break;
+                                    System.out.println(copy + " = " + buttonText[copy]);
+                                    System.out.println(copy + " , " + (copy + 7));
+                                    System.out.println(row(copy) + " , " + row(copy + 7) + " , " + (Math.abs(row(copy) - row(copy + 7)) != 1));
+                                    buttons[copy].setBackground(Color.green);
+                                    copyic = dj;
+                                    if (Math.abs(row(copy) - row(copy + 7)) != 1) {
+                                        break;
+                                    }
+
+                                }
+                                if (limit(copy)) if (black(buttonText[copy])) {
+                                    buttons[copy].setBackground(Color.red);
+                                    copyic = dj;
+                                }
+
+                                System.out.println();
+                                copy = dj + 9;
+                                if (Math.abs(row(copy) - row(copy + 9)) == 1) for (; limit(copy); copy += 9) {
+                                    if (!empty(buttonText[copy])) break;
+                                    System.out.println(copy + " = " + buttonText[copy]);
+                                    System.out.println(copy + " , " + (copy + 9));
+                                    System.out.println(row(copy) + " , " + row(copy + 9) + " , " + (Math.abs(row(copy) - row(copy + 9)) != 1));
+                                    buttons[copy].setBackground(Color.green);
+                                    copyic = dj;
+                                    if (Math.abs(row(copy) - row(copy + 9)) != 1) {
+                                        break;
+                                    }
+
+                                }
+                                if (limit(copy)) if (black(buttonText[copy])) {
+                                    buttons[copy].setBackground(Color.red);
+                                    copyic = dj;
+                                }
+                            } else if (color.equals("black")) {
+
+                                int copy;
+                                System.out.println();
+                                copy = dj - 9;
+                                if (Math.abs(row(copy) - row(copy - 9)) == 1) for (copy = dj - 9; limit(copy); copy -= 9) {
+                                    if (!empty(buttonText[copy])) break;
+                                    System.out.println(copy + " = " + buttonText[copy]);
+                                    System.out.println(copy + " , " + (copy - 9));
+                                    System.out.println(row(copy) + " , " + row(copy - 9) + " , " + (Math.abs(row(copy) - row(copy - 9)) != 1));
+                                    buttons[copy].setBackground(Color.green);
+                                    copyic = dj;
+                                    if (Math.abs(row(copy) - row(copy - 9)) != 1) {
+                                        break;
+                                    }
+
+                                }
+                                if (limit(copy)) if (white(buttonText[copy])) {
+                                    buttons[copy].setBackground(Color.red);
+                                    copyic = dj;
+                                }
+
+                                System.out.println();
+                                copy = dj - 7;
+                                if (Math.abs(row(copy) - row(copy - 7)) == 1) for (; limit(copy); copy -= 7) {
+                                    if (!empty(buttonText[copy])) break;
+                                    System.out.println(copy + " = " + buttonText[copy]);
+                                    System.out.println(copy + " , " + (copy - 7));
+                                    System.out.println(row(copy) + " , " + row(copy - 7) + " , " + (Math.abs(row(copy) - row(copy - 7)) != 1));
+                                    buttons[copy].setBackground(Color.green);
+                                    copyic = dj;
+                                    if (Math.abs(row(copy) - row(copy - 7)) != 1) {
+                                        break;
+                                    }
+
+                                }
+                                if (limit(copy)) if (white(buttonText[copy])) {
+                                    buttons[copy].setBackground(Color.red);
+                                    copyic = dj;
+                                }
+
+                                System.out.println();
+                                copy = dj + 7;
+                                if (Math.abs(row(copy) - row(copy + 7)) == 1) for (; limit(copy); copy += 7) {
+                                    if (!empty(buttonText[copy])) break;
+                                    System.out.println(copy + " = " + buttonText[copy]);
+                                    System.out.println(copy + " , " + (copy + 7));
+                                    System.out.println(row(copy) + " , " + row(copy + 7) + " , " + (Math.abs(row(copy) - row(copy + 7)) != 1));
+                                    buttons[copy].setBackground(Color.green);
+                                    copyic = dj;
+                                    if (Math.abs(row(copy) - row(copy + 7)) != 1) {
+                                        break;
+                                    }
+
+                                }
+                                if (limit(copy)) if (white(buttonText[copy])) {
+                                    buttons[copy].setBackground(Color.red);
+                                    copyic = dj;
+                                }
+
+                                System.out.println();
+                                copy = dj + 9;
+                                if (Math.abs(row(copy) - row(copy + 9)) == 1) for (; limit(copy); copy += 9) {
+                                    if (!empty(buttonText[copy])) break;
+                                    System.out.println(copy + " = " + buttonText[copy]);
+                                    System.out.println(copy + " , " + (copy + 9));
+                                    System.out.println(row(copy) + " , " + row(copy + 9) + " , " + (Math.abs(row(copy) - row(copy + 9)) != 1));
+                                    buttons[copy].setBackground(Color.green);
+                                    copyic = dj;
+                                    if (Math.abs(row(copy) - row(copy + 9)) != 1) {
+                                        break;
+                                    }
+
+                                }
+                                if (limit(copy)) if (white(buttonText[copy])) {
+                                    buttons[copy].setBackground(Color.red);
+                                    copyic = dj;
+                                }
+                            }
+                        }
+                        if (king(buttonText[dj])) {
+                            resetcolor();
+                            if (color.equals("black")) {
+                                int[] moves = {
+                                        dj - 8,
+                                        dj - 7,
+                                        dj + 1,
+                                        dj + 9,
+                                        dj + 8,
+                                        dj + 7,
+                                        dj - 1,
+                                        dj - 9
+                                };
+                                for (int copy: moves) {
+                                    if (limit(copy)) if (empty(buttonText[copy])) {
+                                        buttons[copy].setBackground(Color.green);
+                                        copyic = dj;
+                                    }
+                                    if (limit(copy)) if (white(buttonText[copy])) {
+                                        buttons[copy].setBackground(Color.red);
+                                        copyic = dj;
+                                    }
+
+                                }
+
+                            }
+                            else if (color.equals("white")) {
+                                int[] moves = {
+                                        dj - 8,
+                                        dj - 7,
+                                        dj + 1,
+                                        dj + 9,
+                                        dj + 8,
+                                        dj + 7,
+                                        dj - 1,
+                                        dj - 9
+                                };
+                                for (int copy: moves) {
+                                    if (limit(copy)) if (empty(buttonText[copy])) {
+                                        buttons[copy].setBackground(Color.green);
+                                        copyic = dj;
+                                    }
+                                    if (limit(copy)) if (black(buttonText[copy])) {
+                                        buttons[copy].setBackground(Color.red);
+                                        copyic = dj;
+                                    }
+
+                                }
+
+                            }
+                        }
+                        int a;
+                        if (buttonText[59].equals("♚") && color.equals("black") && buttonText[56].equals("♜") && empty(buttonText[57]) && empty(buttonText[58])) {
+                            a = JOptionPane.showConfirmDialog(f, "\ud835\udd4e\ud835\udd52\ud835\udd5f\ud835\udd65 \ud835\udd65\ud835\udd60 \ud835\udd55\ud835\udd60 \ud835\udd5c\ud835\udd5a\ud835\udd5f\ud835\udd58 \ud835\udd64\ud835\udd5a\ud835\udd55\ud835\udd56 \ud835\udd54\ud835\udd52\ud835\udd64\ud835\udd65\ud835\udd5d\ud835\udd5a\ud835\udd5f\ud835\udd58 ?");
+                            if (a == 0) {
+                                buttonText[57] = buttonText[59];
+                                buttonText[59] = " ";
+                                buttonText[58] = buttonText[56];
+                                buttonText[56] = " ";
+                                JOptionPane.showMessageDialog(f, "ᴀᴄʜɪᴇᴠᴇᴍᴇɴᴛ ᴜɴʟᴏᴄᴋᴇᴅ :\n\ud835\udca6\ud835\udcbe\ud835\udcc3\ud835\udc54 \ud835\udcae\ud835\udcbe\ud835\udcb9\ud835\udc52 \ud835\udc9e\ud835\udcb6\ud835\udcc8\ud835\udcc9\ud835\udcc1\ud835\udcbe\ud835\udcc3\ud835\udc54 !\n");
+                            }
+                        }
+
+                        if (buttonText[3].equals("♔") && color.equals("white") && buttonText[0].equals("♖") && empty(buttonText[1]) && empty(buttonText[2])) {
+                            a = JOptionPane.showConfirmDialog(f, "\ud835\udd4e\ud835\udd52\ud835\udd5f\ud835\udd65 \ud835\udd65\ud835\udd60 \ud835\udd55\ud835\udd60 \ud835\udd5c\ud835\udd5a\ud835\udd5f\ud835\udd58 \ud835\udd64\ud835\udd5a\ud835\udd55\ud835\udd56 \ud835\udd54\ud835\udd52\ud835\udd64\ud835\udd65\ud835\udd5d\ud835\udd5a\ud835\udd5f\ud835\udd58 ?");
+                            if (a == 0) {
+                                buttonText[1] = buttonText[3];
+                                buttonText[3] = " ";
+                                buttonText[2] = buttonText[0];
+                                buttonText[0] = " ";
+                                JOptionPane.showMessageDialog(f, "ᴀᴄʜɪᴇᴠᴇᴍᴇɴᴛ ᴜɴʟᴏᴄᴋᴇᴅ :\n\ud835\udca6\ud835\udcbe\ud835\udcc3\ud835\udc54 \ud835\udcae\ud835\udcbe\ud835\udcb9\ud835\udc52 \ud835\udc9e\ud835\udcb6\ud835\udcc8\ud835\udcc9\ud835\udcc1\ud835\udcbe\ud835\udcc3\ud835\udc54 !\n");
+                            }
+                        }
+                        for (int lp = 0; lp < 64; lp++)
+                            buttons[lp].setText(buttonText[lp]);
+
+                    }
+                });
+
+                buttons[j].setText(buttonText[j]);
+                buttons[j].setSize(10, 10);
+                f.add(buttons[j]);
+            }
+
+            cr = !cr;
+        }
+
+        f.setSize(1000, 1000);
+        f.setLayout(new GridLayout(8, 8));
+        f.setVisible(true); ++ct;
+        f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+    }
+
+    public static void main(String[] args) {
+
+        int a;
+        for (a = 8; a <= 15; ++a) {
+            buttonText[a] = "♙";
+        }
+
+        for (a = 48; a <= 55; ++a) {
+            buttonText[a] = "♟";
+        }
+
+        buttonText[0] = "♖";
+        buttonText[7] = "♖";
+        buttonText[56] = "♜";
+        buttonText[63] = "♜";
+        buttonText[1] = "♘";
+        buttonText[6] = "♘";
+        buttonText[57] = "♞";
+        buttonText[62] = "♞";
+        buttonText[2] = "♗";
+        buttonText[5] = "♗";
+        buttonText[58] = "♝";
+        buttonText[61] = "♝";
+        buttonText[3] = "♔";
+        buttonText[59] = "♚";
+        buttonText[4] = "♕";
+        buttonText[60] = "♛";
+
+        for (a = 16; a <= 47; ++a) {
+            buttonText[a] = " ";
+        }
+
+        new Main();
+    }
+
+    public static boolean pawn(String token) {
+        return token.equals("♙") || token.equals("♟");
+    }
+
+    public static boolean rook(String token) {
+        return token.equals("♖") || token.equals("♜");
+    }
+
+    public static boolean horse(String token) {
+        return token.equals("♘") || token.equals("♞");
+    }
+
+    public static boolean bishop(String token) {
+        return token.equals("♗") || token.equals("♝");
+    }
+
+    public static boolean queen(String token) {
+        return token.equals("♕") || token.equals("♛");
+    }
+
+    public static boolean king(String token) {
+        return token.equals("♔") || token.equals("♚");
+    }
+
+    public static boolean black(String token) {
+        return token.equals("♛") || token.equals("♚") || token.equals("♝") || token.equals("♞") || token.equals("♜") || token.equals("♟");
+    }
+
+    public static boolean white(String token) {
+        return token.equals("♕") || token.equals("♔") || token.equals("♗") || token.equals("♘") || token.equals("♖") || token.equals("♙");
+    }
+
+    public static boolean empty(String token) {
+        return token.equals(" ");
+    }
+
+    public static boolean limit(int len) {
+        return len >= 0 && len <= 63;
+    }
+    public static int row(int dj) {
+        int temp = dj - (dj % 8);
+        return (temp / 8) + 1;
+    }
+    public static void disable(int ct) {
+        for (int i = 0; i < 63; i++) {
+            if (ct % 2 != 0) {
+                buttons[i].setEnabled(!black(buttonText[i]));
+            } else {
+                buttons[i].setEnabled(!white(buttonText[i]));
+
+            }
+        }
+    }
+
+    public static void resetcolor() {
+        for (int i = 0; i < 63; i++) {
+            if (color(i)) buttons[i].setBackground(Color.white);
+            else buttons[i].setBackground(Color.black);
+        }
+    }
+    public static boolean color(int dj) {
+        boolean cr = false;
+        out: for (int i = 0; i < 63; i += 8) {
+            for (int j = i; j <= i + 7; ++j) {
+                cr = !cr;
+                if (dj == j) break out;
+            }
+            cr = !cr;
+        }
+        return cr;
+    }
+}
